@@ -1,0 +1,37 @@
+package views
+
+templ Index(profile interface{}) {
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>TprKpr - how I finance</title>
+        </head>
+        <body>
+        if profile == nil {
+            @Login()
+        } else {
+            @Welcome(profile.(map[string]interface{}))
+        }
+        </body>
+    </html>
+}
+
+templ Login() {
+        <div>
+            <h3>Auth0 Example</h3>
+            <p>Zero friction identity infrastructure, built for developers</p>
+            <a href="/login">SignIn</a>
+        </div>
+}
+
+templ Welcome(profile map[string]interface{}){
+    <div>
+        <h3>Welcome { profile["name"].(string) }</h3>
+        <p>Great to see you again</p>
+        <a href="/logout">Logout</a>
+    </div>
+}
+
+type Profile struct {
+    Name string
+}
