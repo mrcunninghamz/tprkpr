@@ -1,10 +1,11 @@
 package callback
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/mrcunninghamz/tprkpr/platform/authenticator"
-	"net/http"
 )
 
 // Handler for our callback.

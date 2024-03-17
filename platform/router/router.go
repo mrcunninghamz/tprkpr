@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/mrcunninghamz/tprkpr/platform/authenticator"
+	"github.com/mrcunninghamz/tprkpr/web/api/paydays"
 	"github.com/mrcunninghamz/tprkpr/web/app/callback"
 	"github.com/mrcunninghamz/tprkpr/web/app/index"
 	"github.com/mrcunninghamz/tprkpr/web/app/login"
@@ -29,6 +30,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/login", login.Handler(auth))
 	router.GET("/callback", callback.Handler(auth))
 	router.GET("/logout", logout.Handler)
+	router.GET("/api/paydays", paydays.Get)
 	//router.GET("/user", user.Handler)
 
 	return router

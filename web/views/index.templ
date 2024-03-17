@@ -2,9 +2,11 @@ package views
 
 templ Index(profile interface{}) {
     <!DOCTYPE html>
-    <html>
+    <html class="sl-theme-dark">
         <head>
             <title>TprKpr - how I finance</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/themes/dark.css" />
+            <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/shoelace-autoloader.js"></script>
             <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script>
             <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
         </head>
@@ -12,6 +14,7 @@ templ Index(profile interface{}) {
         if profile == nil {
             @Login()
         } else {
+            @TabGroup()
             @Welcome(profile.(map[string]interface{}))
         }
         </body>
@@ -38,8 +41,4 @@ templ Welcome(profile map[string]interface{}){
             window.location.href = "/logout"
         }
     </script> 
-}
-
-type Profile struct {
-    Name string
 }

@@ -1,0 +1,39 @@
+package views
+
+import (
+      "strconv"
+	"github.com/mrcunninghamz/tprkpr/platform/data"
+)
+
+templ TabGroup(){
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/tab-group/tab-group.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/spinner/spinner.js"></script>
+    <sl-tab-group placement="start">
+    <sl-tab slot="nav" panel="general">General</sl-tab>
+    <sl-tab slot="nav" panel="paydays" hx-get="/api/paydays" hx-target="#paydays" hx-swap="innerHTML">PayDays</sl-tab>
+    <sl-tab slot="nav" panel="bills">Bills</sl-tab>
+
+    <sl-tab-panel name="general">This is gonna have the page where we figure out our bills for the month</sl-tab-panel>
+    <sl-tab-panel name="paydays" id="paydays"><sl-spinner style="font-size: 50px; --track-width: 10px;"></sl-spinner></sl-tab-panel>
+    <sl-tab-panel name="bills">This is going to show the bills we have.</sl-tab-panel>
+</sl-tab-group>
+}
+
+templ PayDays(data data.DataContext){
+    for _, item := range data.Paydays {
+        <sl-card class="card-header">
+        <div slot="header">
+            Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
+            <sl-icon-button name="gear" label="Settings"></sl-icon-button>
+        </div>
+        for _, bill := range data.Bills {
+            if bill.PaydayId == item.Id{
+                <sl-details summary={bill.Name}>
+                    Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
+                    Amount: { bill.Amount.String() } 
+                </sl-details>
+            }
+        }
+        </sl-card>
+    }
+}
