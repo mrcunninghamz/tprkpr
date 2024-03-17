@@ -5,6 +5,8 @@ templ Index(profile interface{}) {
     <html>
         <head>
             <title>TprKpr - how I finance</title>
+            <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
         </head>
         <body>
         if profile == nil {
@@ -28,8 +30,14 @@ templ Welcome(profile map[string]interface{}){
     <div>
         <h3>Welcome { profile["name"].(string) }</h3>
         <p>Great to see you again</p>
-        <a href="/logout">Logout</a>
+        <a href="#" hx-on:click="logout()">Logout</a>
     </div>
+    <script> 
+        function logout(){
+            Cookies.remove('auth-session')
+            window.location.href = "/logout"
+        }
+    </script> 
 }
 
 type Profile struct {

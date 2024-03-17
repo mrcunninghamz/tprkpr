@@ -9,6 +9,7 @@ import (
 	"github.com/mrcunninghamz/tprkpr/web/app/callback"
 	"github.com/mrcunninghamz/tprkpr/web/app/index"
 	"github.com/mrcunninghamz/tprkpr/web/app/login"
+	"github.com/mrcunninghamz/tprkpr/web/app/logout"
 )
 
 // New registers the routes and returns the router.
@@ -27,8 +28,8 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/", index.Handler)
 	router.GET("/login", login.Handler(auth))
 	router.GET("/callback", callback.Handler(auth))
+	router.GET("/logout", logout.Handler)
 	//router.GET("/user", user.Handler)
-	//router.GET("/logout", logout.Handler)
 
 	return router
 }
