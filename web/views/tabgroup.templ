@@ -2,7 +2,7 @@ package views
 
 import (
       "strconv"
-	"github.com/mrcunninghamz/tprkpr/platform/data"
+	"github.com/mrcunninghamz/tprkpr/platform/data/models"
 )
 
 templ TabGroup(){
@@ -19,20 +19,18 @@ templ TabGroup(){
 </sl-tab-group>
 }
 
-templ PayDays(data data.DataContext){
-    for _, item := range data.Paydays {
+templ PayDays(data []models.Payday){
+    for _, item := range data {
         <sl-card class="card-header">
         <div slot="header">
             Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
             <sl-icon-button name="gear" label="Settings"></sl-icon-button>
         </div>
-        for _, bill := range data.Bills {
-            if bill.PaydayId == item.Id{
-                <sl-details summary={bill.Name}>
-                    Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
-                    Amount: { bill.Amount.String() } 
-                </sl-details>
-            }
+        for _, bill := range item.Bills {
+            <sl-details summary={bill.Name}>
+                Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
+                Amount: { bill.Amount.String() } 
+            </sl-details>
         }
         </sl-card>
     }

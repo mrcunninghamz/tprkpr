@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/joho/godotenv"
 	"github.com/mrcunninghamz/tprkpr/platform/authenticator"
+	"github.com/mrcunninghamz/tprkpr/platform/data"
 	"github.com/mrcunninghamz/tprkpr/platform/router"
 	"log"
 	"net/http"
@@ -18,7 +19,11 @@ func main() {
 		log.Fatalf("Failed to initialize the authenticator: %v", err)
 	}
 
-	rtr := router.New(auth)
+	db, err := data.Connect()
+	if err != nil {
+		log.Fatalf("Failed to initialize the db: %v", err)
+	}
+	rtr := router.New(auth, db)
 
 	log.Print("Server listening on http://localhost:3000/")
 	if err := http.ListenAndServe("0.0.0.0:3000", rtr); err != nil {
