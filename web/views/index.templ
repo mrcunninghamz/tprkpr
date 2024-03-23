@@ -1,6 +1,11 @@
 package views
 
-templ Index(profile interface{}) {
+import (
+    "github.com/mrcunninghamz/tprkpr/platform/authenticator"
+    "strings"
+)
+
+templ Index(profile authenticator.UserProfile) {
     <!DOCTYPE html>
     <html class="sl-theme-dark">
         <head>
@@ -11,11 +16,11 @@ templ Index(profile interface{}) {
             <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
         </head>
         <body>
-        if profile == nil {
+        if len(strings.TrimSpace(profile.Id)) == 0  {
             @Login()
         } else {
             @TabGroup()
-            @Welcome(profile.(map[string]interface{}))
+            @Welcome(profile)
         }
         </body>
     </html>
@@ -29,9 +34,9 @@ templ Login() {
         </div>
 }
 
-templ Welcome(profile map[string]interface{}){
+templ Welcome(profile authenticator.UserProfile){
     <div>
-        <h3>Welcome { profile["name"].(string) }</h3>
+        <h3>Welcome { profile.Name}</h3>
         <p>Great to see you again</p>
         <a href="#" hx-on:click="logout()">Logout</a>
     </div>
