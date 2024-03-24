@@ -20,8 +20,8 @@ templ Index(profile authenticator.UserProfile) {
         if len(strings.TrimSpace(profile.Id)) == 0  {
             @Login()
         } else {
-            @TabGroup()
             @Welcome(profile)
+            @TabGroup()
         }
         </body>
     </html>
@@ -29,17 +29,20 @@ templ Index(profile authenticator.UserProfile) {
 
 templ Login() {
         <div>
-            <h3>Auth0 Example</h3>
-            <p>Zero friction identity infrastructure, built for developers</p>
+            <h3>TrpKpr - How I finance</h3>
+            <p>It's better than using a binder full of papers... looking at you dad.</p>
             <a href="/login">SignIn</a>
         </div>
 }
 
 templ Welcome(profile authenticator.UserProfile){
-    <div>
-        <h3>Welcome { profile.Name}</h3>
-        <p>Great to see you again</p>
-        <a href="#" hx-on:click="logout()">Logout</a>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/divider/divider.js"></script>
+    <div style="display: flex; align-items: right; height: 2rem;">
+    TrpKpr - How I finance
+    <sl-divider vertical></sl-divider>
+    { profile.Name}
+    <sl-divider vertical></sl-divider>
+    <a href="#" hx-on:click="logout()">Logout</a>
     </div>
     <script> 
         function logout(){

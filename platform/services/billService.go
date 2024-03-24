@@ -10,6 +10,7 @@ type Bills interface {
 	AddBill(bill *models.Bill) error
 	GetBill(id uuid.UUID) (models.Bill, error)
 	UpdateBill(bill *models.Bill) (models.Bill, error)
+	CreateBill(bill *models.Bill) (models.Bill, error)
 }
 
 type BillService struct {
@@ -39,6 +40,16 @@ func (bs *BillService) GetBill(id uuid.UUID) (models.Bill, error) {
 
 func (bs *BillService) UpdateBill(bill *models.Bill) (models.Bill, error) {
 	result := bs.DB.Save(bill)
+
+	if result.Error != nil {
+		return *bill, result.Error
+	}
+
+	return *bill, nil
+}
+
+func (bs *BillService) CreateBill(bill *models.Bill) (models.Bill, error) {
+	result := bs.DB.Create(bill)
 
 	if result.Error != nil {
 		return *bill, result.Error

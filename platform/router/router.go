@@ -9,6 +9,7 @@ import (
 	"github.com/mrcunninghamz/tprkpr/platform/data"
 	"github.com/mrcunninghamz/tprkpr/platform/services"
 	"github.com/mrcunninghamz/tprkpr/web/api/bills" // assuming this is the package name
+	"github.com/mrcunninghamz/tprkpr/web/api/empty"
 	"github.com/mrcunninghamz/tprkpr/web/api/paydays"
 	"github.com/mrcunninghamz/tprkpr/web/app/callback"
 	"github.com/mrcunninghamz/tprkpr/web/app/index"
@@ -35,9 +36,13 @@ func New(auth *authenticator.Authenticator, dataContext *data.DataContext) *gin.
 	router.GET("/logout", logout.Handler)
 	router.GET("/api/paydays", paydays.Get(paydayService))
 
-	router.GET("/views/bill/edit/:id", bills.Edit(billService))
-	router.POST("/views/bill/edit/:id", bills.Update(billService))
+	router.GET("/views/bill/edit/:id", bills.EditForm(billService))
 	router.GET("/views/bill/:id", bills.View(billService))
+	router.GET("/views/bill/new/:paydayId", bills.NewForm)
+	router.POST("/views/bill/:id", bills.Update(billService))
+	router.POST("/views/payday/:paydayId/bill", bills.Create(billService))
+
+	router.DELETE("/views/empty", empty.New)
 
 	router.StaticFile("/htmx.ext.shoelace.js", "web/htmx.ext.shoelace.js")
 
