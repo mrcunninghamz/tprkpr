@@ -101,7 +101,6 @@ func Create(billService services.Bills) func(c *gin.Context) {
 			return
 		}
 
-		bill.ID, _ = uuid.NewV4()
 		createdBill, err := billService.CreateBill(bill)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create bill"})

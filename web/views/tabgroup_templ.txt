@@ -1,4 +1,5 @@
-<script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/tab-group/tab-group.js\"></script><script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/spinner/spinner.js\"></script><sl-tab-group placement=\"start\"><sl-tab slot=\"nav\" panel=\"general\">General</sl-tab> <sl-tab slot=\"nav\" panel=\"paydays\" hx-get=\"/api/paydays\" hx-target=\"#paydays\" hx-swap=\"innerHTML\">PayDays</sl-tab> <sl-tab slot=\"nav\" panel=\"bills\">Bills</sl-tab> <sl-tab-panel name=\"general\">This is gonna have the page where we figure out our bills for the month</sl-tab-panel> <sl-tab-panel name=\"paydays\" id=\"paydays\"><sl-spinner style=\"font-size: 50px; --track-width: 10px;\"></sl-spinner></sl-tab-panel> <sl-tab-panel name=\"bills\">This is going to show the bills we have.</sl-tab-panel></sl-tab-group>
+<script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/tab-group/tab-group.js\"></script><script type=\"module\" src=\"https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/spinner/spinner.js\"></script><script src=\"https://unpkg.com/htmx.org@1.9.11/dist/ext/json-enc.js\"></script><sl-tab-group placement=\"start\"><sl-tab slot=\"nav\" panel=\"general\">General</sl-tab> <sl-tab slot=\"nav\" panel=\"paydays\" hx-get=\"/api/paydays\" hx-target=\"#paydays\" hx-swap=\"innerHTML\">PayDays</sl-tab> <sl-tab slot=\"nav\" panel=\"bills\">Bills</sl-tab> <sl-tab-panel name=\"general\">This is gonna have the page where we figure out our bills for the month</sl-tab-panel> <sl-tab-panel name=\"paydays\" id=\"paydays\"><sl-spinner style=\"font-size: 50px; --track-width: 10px;\"></sl-spinner></sl-tab-panel> <sl-tab-panel name=\"bills\">This is going to show the bills we have.</sl-tab-panel></sl-tab-group>
+<sl-button variant=\"primary\" hx-get=\"/api/payday/new\" hx-target=\"#divider\" hx-swap=\"afterend\" hx-trigger=\"click\">New Payday</sl-button> <sl-divider id=\"divider\"></sl-divider> 
 <sl-card class=\"card-overview\"><div slot=\"header\" id=\"
 \">Payday on day 
  of the month. <sl-tooltip content=\"Add a bill\"><sl-icon-button name=\"plus-circle\" label=\"Add a bill\" hx-get=\"
@@ -13,7 +14,7 @@
 </div><sl-button variant=\"text\" size=\"small\" hx-get=\"
 \" hx-target=\"
 \" hx-swap=\"outerHTML\" hx-trigger=\"click\">Edit</sl-button></sl-details>
-<script src=\"https://unpkg.com/htmx.org@1.9.11/dist/ext/json-enc.js\"></script><sl-details summary=\"
+<sl-details summary=\"
 \" id=\"
 \" open><form hx-post=\"
 \" hx-ext=\"json-enc\" hx-target=\"
@@ -22,9 +23,20 @@
 \"></sl-input> <sl-input id=\"due_date_of_month\" name=\"due_date_of_month\" label=\"Due Date\" value=\"
 \" type=\"number\"></sl-input> <sl-visually-hidden><sl-input id=\"payday_id\" name=\"payday_id\" value=\"
 \"></sl-input></sl-visually-hidden> <sl-button type=\"submit\" pill>Submit</sl-button> 
-<sl-button variant=\"text\" size=\"small\" hx-delete=\"/views/empty\" hx-target=\"
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"/api/empty\" hx-target=\"
 \" hx-trigger=\"click\">Cancel</sl-button>
 <sl-button variant=\"text\" size=\"small\" hx-get=\"
 \" hx-target=\"
 \" hx-swap=\"outerHTML\" hx-trigger=\"click\">Cancel</sl-button>
 </form></sl-details>
+<sl-card class=\"card-overview\" id=\"
+\"><form hx-post=\"
+\" hx-ext=\"json-enc\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"submit\"><sl-input id=\"pay_date_of_month\" name=\"pay_date_of_month\" label=\"Pay Date of Month\" value=\"
+\" type=\"number\" pill></sl-input> <sl-button type=\"submit\" pill>Submit</sl-button> 
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"/api/empty\" hx-target=\"
+\" hx-trigger=\"click\">Cancel</sl-button>
+<sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Cancel</sl-button>
+</form></sl-card>

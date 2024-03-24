@@ -49,6 +49,8 @@ func (bs *BillService) UpdateBill(bill *models.Bill) (models.Bill, error) {
 }
 
 func (bs *BillService) CreateBill(bill *models.Bill) (models.Bill, error) {
+	bill.ID, _ = uuid.NewV4()
+
 	result := bs.DB.Create(bill)
 
 	if result.Error != nil {

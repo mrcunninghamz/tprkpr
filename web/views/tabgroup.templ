@@ -10,6 +10,7 @@ import (
 templ TabGroup(){
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/tab-group/tab-group.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/spinner/spinner.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/json-enc.js"></script>
     <sl-tab-group placement="start">
     <sl-tab slot="nav" panel="general">General</sl-tab>
 	<sl-tab slot="nav" panel="paydays" hx-get="/api/paydays" hx-target="#paydays" hx-swap="innerHTML">PayDays</sl-tab>
@@ -22,23 +23,28 @@ templ TabGroup(){
 }
 
 templ PayDays(data []models.Payday){
+    <sl-button variant="primary" hx-get="/api/payday/new" hx-target="#divider" hx-swap="afterend" hx-trigger="click">New Payday</sl-button>
+    <sl-divider id="divider"></sl-divider>
 	for _, item := range data {
-		<sl-card class="card-overview">
+		@PaydayCard(item)
+	}
+}
+
+templ PaydayCard(item models.Payday){
+    <sl-card class="card-overview">
             <div slot="header" id={fmt.Sprintf("%s%s", "payday-", item.ID)}>
                 Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
                 <sl-tooltip content="Add a bill">
-                    <sl-icon-button name="plus-circle" label="Add a bill" hx-get={fmt.Sprintf("%s%s", "/views/bill/new/", item.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-swap="afterend" hx-trigger="click"></sl-icon-button>
+                    <sl-icon-button name="plus-circle" label="Add a bill" hx-get={fmt.Sprintf("%s%s", "/api/bill/new/", item.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-swap="afterend" hx-trigger="click"></sl-icon-button>
                 </sl-tooltip>
             </div>
 		for _, bill := range item.Bills {
 			@BillDetail(&bill, false)
     	}
-
             <div slot="footer">
                 <sl-icon-button name="gear" label="Settings"></sl-icon-button>
             </div>
 		</sl-card>
-	}
 }
 
 templ BillDetail(bill *models.Bill, isOpen bool){
@@ -47,15 +53,14 @@ templ BillDetail(bill *models.Bill, isOpen bool){
             Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
             Amount: { bill.Amount.String() }
         </div>
-        <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/views/bill/edit/", bill.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", bill.ID)} hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
+        <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/bill/edit/", bill.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", bill.ID)} hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
     </sl-details>
 }
 
 templ BillForm(data *models.Bill) {
-    <script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/json-enc.js"></script>
 	<sl-details summary={data.Name} id={fmt.Sprintf("%s%s", "bill-detail-", data.ID)} open>
     	<form 
-            hx-post={checkIdForActionUrl(data.ID, data.PaydayId)} 
+            hx-post={checkIdForBillActionUrl(data.ID, data.PaydayId)} 
             hx-ext="json-enc" 
             hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)}
             hx-swap="outerHTML"
@@ -69,26 +74,57 @@ templ BillForm(data *models.Bill) {
     		<sl-button type="submit" pill>Submit</sl-button>
 
             if uuid.UUID.IsNil(data.ID) {
-                <sl-button variant="text" size="small" hx-delete="/views/empty" hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-trigger="click">Cancel</sl-button>
+                <sl-button variant="text" size="small" hx-delete="/api/empty" hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-trigger="click">Cancel</sl-button>
             }
             else {
-                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/views/bill/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/bill/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
             }
             
     	</form>
     </sl-details>
 }
 
+templ PaydayForm(data *models.Payday) {
+	<sl-card class="card-overview" id={fmt.Sprintf("%s%s", "payday-overview-", data.ID)}>
+    	<form 
+            hx-post={checkIdForPaydayActionUrl(data.ID)} 
+            hx-ext="json-enc" 
+            hx-target={fmt.Sprintf("#%s%s", "payday-overview-", data.ID)}
+            hx-swap="outerHTML"
+            hx-trigger="submit">
+    		<sl-input id="pay_date_of_month" name="pay_date_of_month" label="Pay Date of Month" value={strconv.Itoa(data.PayDateOfMonth)} type="number" pill></sl-input>
+    		<sl-button type="submit" pill>Submit</sl-button>
+
+            if uuid.UUID.IsNil(data.ID) {
+                <sl-button variant="text" size="small" hx-delete="/api/empty" hx-target={fmt.Sprintf("#%s%s", "payday-overview-", data.ID)} hx-trigger="click">Cancel</sl-button>
+            }
+            else {
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/payday/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-overview-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+            }
+            
+    	</form>
+    </sl-card>
+}
+
 templ Empty(){
 }
 
 
-func checkIdForActionUrl(billId uuid.UUID, payDayId uuid.UUID) string {
+func checkIdForBillActionUrl(billId uuid.UUID, payDayId uuid.UUID) string {
     if uuid.UUID.IsNil(billId){
-        return fmt.Sprintf("/views/payday/%s/bill", payDayId)
+        return fmt.Sprintf("/api/payday/%s/bill", payDayId)
     }
     
-    return fmt.Sprintf("%s%s", "/views/bill/", billId)
+    return fmt.Sprintf("%s%s", "/api/bill/", billId)
+    
+}
+
+func checkIdForPaydayActionUrl(payDayId uuid.UUID) string {
+    if uuid.UUID.IsNil(payDayId){
+        return "/api/payday"
+    }
+    
+    return fmt.Sprintf("%s%s", "/api/payday/", payDayId)
     
 }
 

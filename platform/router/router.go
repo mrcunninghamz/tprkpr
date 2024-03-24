@@ -34,15 +34,17 @@ func New(auth *authenticator.Authenticator, dataContext *data.DataContext) *gin.
 	router.GET("/login", login.Handler(auth))
 	router.GET("/callback", callback.Handler(auth))
 	router.GET("/logout", logout.Handler)
+
 	router.GET("/api/paydays", paydays.Get(paydayService))
-
-	router.GET("/views/bill/edit/:id", bills.EditForm(billService))
-	router.GET("/views/bill/:id", bills.View(billService))
-	router.GET("/views/bill/new/:paydayId", bills.NewForm)
-	router.POST("/views/bill/:id", bills.Update(billService))
-	router.POST("/views/payday/:paydayId/bill", bills.Create(billService))
-
-	router.DELETE("/views/empty", empty.New)
+	router.GET("/api/payday/:id", paydays.View(paydayService))
+	router.GET("/api/payday/new", paydays.NewForm)
+	router.POST("/api/payday", paydays.Create(paydayService))
+	router.GET("/api/bill/edit/:id", bills.EditForm(billService))
+	router.GET("/api/bill/:id", bills.View(billService))
+	router.GET("/api/bill/new/:paydayId", bills.NewForm)
+	router.POST("/api/bill/:id", bills.Update(billService))
+	router.POST("/api/payday/:paydayId/bill", bills.Create(billService))
+	router.DELETE("/api/empty", empty.New)
 
 	router.StaticFile("/htmx.ext.shoelace.js", "web/htmx.ext.shoelace.js")
 
