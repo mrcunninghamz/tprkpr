@@ -6,12 +6,12 @@ import (
 )
 
 type Bill struct {
-	ID                     uuid.UUID
-	DueDateOfMonth         int
-	Name                   string
-	Notes                  string
-	AutoPayment            bool
-	AutoPaymentDateOfMonth int
-	Amount                 decimal.Decimal
-	PaydayId               uuid.UUID
+	ID                     uuid.UUID       `json:"id"`
+	DueDateOfMonth         int             `json:"due_date_of_month"`
+	Name                   string          `json:"name"`
+	Notes                  string          `json:"notes"`
+	AutoPayment            bool            `json:"auto_payment"`
+	AutoPaymentDateOfMonth int             `json:"auto_payment_date_of_month"`
+	Amount                 decimal.Decimal `json:"amount"`
+	PaydayId               uuid.UUID       `json:"payday_id"`
 }

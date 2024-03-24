@@ -1,27 +1,27 @@
 package services
 
 import (
-	"github.com/mrcunninghamz/tprkpr/platform/data"
 	"github.com/mrcunninghamz/tprkpr/platform/data/models"
+	"gorm.io/gorm"
 )
-
-type PaydayService struct {
-	DbContext *data.DataContext
-}
 
 type Paydays interface {
 	Get(userId string) []models.Payday
 }
 
-func NewPayDayService(dbContext *data.DataContext) *PaydayService {
+type PaydayService struct {
+	*gorm.DB
+}
+
+func NewPayDayService(db *gorm.DB) *PaydayService {
 	return &PaydayService{
-		dbContext,
+		db,
 	}
 }
 
 func (service *PaydayService) Get(userId string) []models.Payday {
 	var paydays []models.Payday
-	service.DbContext.DB.Preload("Bills").Where(&models.Payday{UserID: userId}).Find(&paydays)
+	service.DB.Preload("Bills").Where(&models.Payday{UserID: userId}).Find(&paydays)
 
 	return paydays
 }

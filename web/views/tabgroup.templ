@@ -1,7 +1,8 @@
 package views
 
 import (
-      "strconv"
+    "fmt"
+    "strconv"
 	"github.com/mrcunninghamz/tprkpr/platform/data/models"
 )
 
@@ -10,28 +11,64 @@ templ TabGroup(){
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/components/spinner/spinner.js"></script>
     <sl-tab-group placement="start">
     <sl-tab slot="nav" panel="general">General</sl-tab>
-    <sl-tab slot="nav" panel="paydays" hx-get="/api/paydays" hx-target="#paydays" hx-swap="innerHTML">PayDays</sl-tab>
-    <sl-tab slot="nav" panel="bills">Bills</sl-tab>
+	<sl-tab slot="nav" panel="paydays" hx-get="/api/paydays" hx-target="#paydays" hx-swap="innerHTML">PayDays</sl-tab>
+	<sl-tab slot="nav" panel="bills">Bills</sl-tab>
 
-    <sl-tab-panel name="general">This is gonna have the page where we figure out our bills for the month</sl-tab-panel>
-    <sl-tab-panel name="paydays" id="paydays"><sl-spinner style="font-size: 50px; --track-width: 10px;"></sl-spinner></sl-tab-panel>
-    <sl-tab-panel name="bills">This is going to show the bills we have.</sl-tab-panel>
+	<sl-tab-panel name="general">This is gonna have the page where we figure out our bills for the month</sl-tab-panel>
+	<sl-tab-panel name="paydays" id="paydays"><sl-spinner style="font-size: 50px; --track-width: 10px;"></sl-spinner></sl-tab-panel>
+	<sl-tab-panel name="bills">This is going to show the bills we have.</sl-tab-panel>
 </sl-tab-group>
 }
 
 templ PayDays(data []models.Payday){
-    for _, item := range data {
-        <sl-card class="card-header">
-        <div slot="header">
-            Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
-            <sl-icon-button name="gear" label="Settings"></sl-icon-button>
+	for _, item := range data {
+		<sl-card class="card-header">
+		<div slot="header">
+			Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
+			<sl-icon-button name="gear" label="Settings"></sl-icon-button>
+		</div>
+		for _, bill := range item.Bills {
+			@BillDetail(bill, false)
+    	}
+		</sl-card>
+	}
+}
+
+templ BillDetail(bill models.Bill, isOpen bool){
+    <sl-details summary={bill.Name} id={fmt.Sprintf("%s%s", "bill-detail-", bill.ID)} open={isTrue(isOpen)}>
+         <div>
+            Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
+            Amount: { bill.Amount.String() }
         </div>
-        for _, bill := range item.Bills {
-            <sl-details summary={bill.Name}>
-                Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
-                Amount: { bill.Amount.String() } 
-            </sl-details>
-        }
-        </sl-card>
+        <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/views/bill/edit/", bill.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", bill.ID)} hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
+    </sl-details>
+}
+
+templ BillForm(data models.Bill) {
+    <script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/json-enc.js"></script>
+	<sl-details summary={data.Name} id={fmt.Sprintf("%s%s", "bill-detail-", data.ID)} open>
+    	<form 
+            hx-post={fmt.Sprintf("%s%s", "/views/bill/edit/", data.ID)} 
+            hx-ext="json-enc" 
+            hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)}
+            hx-swap="outerHTML"
+            hx-trigger="submit">
+    		<sl-input id="name" name="name" label="Name" value={data.Name} pill></sl-input>
+    		<sl-input id="amount" name="amount" label="Amount" value={data.Amount.String()}></sl-input>
+    		<sl-input id="due_date_of_month" name="due_date_of_month" label="Due Date" value={strconv.Itoa(data.DueDateOfMonth)} type="number"></sl-input>
+            <sl-visually-hidden>
+    		    <sl-input id="payday_id" name="payday_id" value={data.PaydayId.String()}></sl-input>
+            </sl-visually-hidden>
+    		<sl-button type="submit" pill>Submit</sl-button>
+            <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/views/bill/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+    	</form>
+    </sl-details>
+}
+
+func isTrue(condition bool) string {
+    if condition {
+        return "true"
     }
+
+    return "false"
 }
