@@ -1,0 +1,25 @@
+<sl-details summary=\"
+\" id=\"
+\" open=\"
+\"><div>Due Date: 
+<br>Amount: 
+</div><sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Edit</sl-button> <sl-button variant=\"text\" size=\"small\" hx-delete=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Delete</sl-button></sl-details>
+<sl-details summary=\"
+\" id=\"
+\" open><form hx-post=\"
+\" hx-ext=\"json-enc\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"submit\"><sl-input id=\"name\" name=\"name\" label=\"Name\" value=\"
+\" pill></sl-input> <sl-input id=\"amount\" name=\"amount\" label=\"Amount\" value=\"
+\"></sl-input> <sl-input id=\"due_date_of_month\" name=\"due_date_of_month\" label=\"Due Date\" value=\"
+\" type=\"number\"></sl-input> <sl-visually-hidden><sl-input id=\"payday_id\" name=\"payday_id\" value=\"
+\"></sl-input></sl-visually-hidden> <sl-button type=\"submit\" pill>Submit</sl-button> 
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"/api/empty\" hx-target=\"
+\" hx-trigger=\"click\">Cancel</sl-button>
+<sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Cancel</sl-button>
+</form></sl-details>

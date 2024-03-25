@@ -10,6 +10,8 @@ type Paydays interface {
 	GetPaydays(userId string) []models.Payday
 	GetPayday(paydayId uuid.UUID) (models.Payday, error)
 	CreatePayday(payday *models.Payday) (models.Payday, error)
+	UpdatePayday(payday *models.Payday) error // New function definition
+	DeletePayday(paydayId uuid.UUID) error
 }
 
 type PaydayService struct {
@@ -24,7 +26,7 @@ func NewPayDayService(db *gorm.DB) *PaydayService {
 
 func (service *PaydayService) GetPaydays(userId string) []models.Payday {
 	var paydays []models.Payday
-	service.DB.Preload("Bills").Where(&models.Payday{UserID: userId}).Find(&paydays)
+	service.DB.Preload("Bills").Where(&models.Payday{UserID: userId}).Order("pay_date_of_month asc").Find(&paydays)
 
 	return paydays
 }
@@ -47,4 +49,16 @@ func (service *PaydayService) CreatePayday(payday *models.Payday) (models.Payday
 		return *payday, result.Error
 	}
 	return *payday, nil
+}
+
+func (service *PaydayService) UpdatePayday(payday *models.Payday) error { // New function implementation
+	result := service.DB.Model(payday).Updates(*payday)
+	return result.Error
+}
+
+func (service *PaydayService) DeletePayday(paydayId uuid.UUID) error {
+	var payday models.Payday
+
+	result := service.DB.Where(&models.Payday{ID: paydayId}).Delete(&payday)
+	return result.Error
 }

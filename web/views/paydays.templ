@@ -1,0 +1,72 @@
+package views
+
+import (
+    "fmt"
+    "strconv"
+	"github.com/mrcunninghamz/tprkpr/platform/data/models"
+	"github.com/gofrs/uuid"
+)
+
+templ PayDays(data []models.Payday){
+    <sl-button variant="primary" hx-get="/api/payday/new" hx-target="next div" hx-swap="afterbegin" hx-trigger="click">New Payday</sl-button>
+    <sl-divider id="divider"></sl-divider>
+    <div>
+	for _, item := range data {
+		@PaydayCard(item)
+	}
+    </div>
+}
+
+templ PaydayCard(item models.Payday){
+    <sl-card class="card-overview" id={fmt.Sprintf("%s%s", "payday-", item.ID)}>
+            <div slot="header">
+                Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
+                <sl-tooltip content="Add a bill">
+                    <sl-icon-button name="plus-circle" label="Add a bill" hx-get={fmt.Sprintf("%s%s", "/api/bill/new/", item.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-swap="beforeend" hx-trigger="click"></sl-icon-button>
+                </sl-tooltip>
+            </div>
+		for _, bill := range item.Bills {
+			@BillDetail(&bill, false)
+    	}
+            <div slot="footer">
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/payday/edit/", item.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-trigger="click">Edit</sl-button>
+                if uuid.UUID.IsNil(item.ID) {
+                    <sl-button variant="text" size="small" hx-delete="/api/empty" hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-trigger="click">Cancel</sl-button>
+                }
+                else {
+                    <sl-button variant="text" size="small" hx-delete={fmt.Sprintf("%s%s", "/api/payday/", item.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", item.ID)} hx-swap="outerHTML" hx-trigger="click">Delete</sl-button>
+                }
+            </div>
+		</sl-card>
+}
+
+templ PaydayForm(data *models.Payday) {
+	<sl-card class="card-overview" id={fmt.Sprintf("%s%s", "payday-", data.ID)}>
+    	<form 
+            hx-post={checkIdForPaydayActionUrl(data.ID)} 
+            hx-ext="json-enc" 
+            hx-target="#paydays"
+            hx-swap="innerHTML"
+            hx-trigger="submit">
+    		<sl-input id="pay_date_of_month" name="pay_date_of_month" label="Pay Date of Month" value={strconv.Itoa(data.PayDateOfMonth)} type="number" pill></sl-input>
+    		<sl-button type="submit" pill>Submit</sl-button>
+
+            if uuid.UUID.IsNil(data.ID) {
+                <sl-button variant="text" size="small" hx-delete="/api/empty" hx-target={fmt.Sprintf("#%s%s", "payday-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+            }
+            else {
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/payday/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "payday-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+            }
+            
+    	</form>
+    </sl-card>
+}
+
+func checkIdForPaydayActionUrl(payDayId uuid.UUID) string {
+    if uuid.UUID.IsNil(payDayId){
+        return "/api/payday"
+    }
+    
+    return fmt.Sprintf("%s%s", "/api/payday/", payDayId)
+    
+}

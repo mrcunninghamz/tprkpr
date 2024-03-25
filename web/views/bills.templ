@@ -1,0 +1,55 @@
+package views
+
+import (
+    "fmt"
+    "strconv"
+	"github.com/mrcunninghamz/tprkpr/platform/data/models"
+	"github.com/gofrs/uuid"
+)
+
+templ BillDetail(bill *models.Bill, isOpen bool){
+    <sl-details summary={bill.Name} id={fmt.Sprintf("%s%s", "bill-detail-", bill.ID)} open={isTrue(isOpen)}>
+         <div>
+            Due Date: { strconv.Itoa(bill.DueDateOfMonth) } <br/>
+            Amount: { bill.Amount.String() }
+        </div>
+        <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/bill/edit/", bill.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", bill.ID)} hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
+        <sl-button variant="text" size="small" hx-delete={fmt.Sprintf("%s%s", "/api/bill/", bill.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", bill.ID)} hx-swap="outerHTML" hx-trigger="click">Delete</sl-button>
+    </sl-details>
+}
+
+templ BillForm(data *models.Bill) {
+	<sl-details summary={data.Name} id={fmt.Sprintf("%s%s", "bill-detail-", data.ID)} open>
+    	<form 
+            hx-post={checkIdForBillActionUrl(data.ID, data.PaydayId)} 
+            hx-ext="json-enc" 
+            hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)}
+            hx-swap="outerHTML"
+            hx-trigger="submit">
+    		<sl-input id="name" name="name" label="Name" value={data.Name} pill></sl-input>
+    		<sl-input id="amount" name="amount" label="Amount" value={data.Amount.String()}></sl-input>
+    		<sl-input id="due_date_of_month" name="due_date_of_month" label="Due Date" value={strconv.Itoa(data.DueDateOfMonth)} type="number"></sl-input>
+            <sl-visually-hidden>
+    		    <sl-input id="payday_id" name="payday_id" value={data.PaydayId.String()}></sl-input>
+            </sl-visually-hidden>
+    		<sl-button type="submit" pill>Submit</sl-button>
+
+            if uuid.UUID.IsNil(data.ID) {
+                <sl-button variant="text" size="small" hx-delete="/api/empty" hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-trigger="click">Cancel</sl-button>
+            }
+            else {
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/bill/", data.ID)} hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)} hx-swap="outerHTML" hx-trigger="click">Cancel</sl-button>
+            }
+            
+    	</form>
+    </sl-details>
+}
+
+func checkIdForBillActionUrl(billId uuid.UUID, payDayId uuid.UUID) string {
+    if uuid.UUID.IsNil(billId){
+        return fmt.Sprintf("/api/bill/payday/%s", payDayId)
+    }
+    
+    return fmt.Sprintf("%s%s", "/api/bill/", billId)
+    
+}

@@ -109,3 +109,22 @@ func Create(billService services.Bills) func(c *gin.Context) {
 		templ.Handler(views.BillDetail(&createdBill, true)).ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
+
+func Delete(billService services.Bills) func(c *gin.Context) {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		billID, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid bill ID"})
+			return
+		}
+
+		err = billService.DeleteBill(billID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete bill"})
+			return
+		}
+		templ.Handler(views.Empty()).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}

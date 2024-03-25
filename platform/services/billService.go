@@ -11,6 +11,7 @@ type Bills interface {
 	GetBill(id uuid.UUID) (models.Bill, error)
 	UpdateBill(bill *models.Bill) (models.Bill, error)
 	CreateBill(bill *models.Bill) (models.Bill, error)
+	DeleteBill(id uuid.UUID) error
 }
 
 type BillService struct {
@@ -58,4 +59,11 @@ func (bs *BillService) CreateBill(bill *models.Bill) (models.Bill, error) {
 	}
 
 	return *bill, nil
+}
+
+func (bs *BillService) DeleteBill(id uuid.UUID) error {
+	var bill models.Bill
+	result := bs.DB.Where(&models.Bill{ID: id}).Delete(&bill)
+
+	return result.Error
 }

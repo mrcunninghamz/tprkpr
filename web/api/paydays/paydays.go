@@ -13,6 +13,24 @@ import (
 	"net/http"
 )
 
+func EditForm(paydayService services.Paydays) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		paydayID, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payday ID"})
+			return
+		}
+		payday, err := paydayService.GetPayday(paydayID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payday"})
+			return
+		}
+
+		templ.Handler(views.PaydayForm(&payday)).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
 func Get(paydayService services.Paydays) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
@@ -68,12 +86,68 @@ func Create(paydayService services.Paydays) gin.HandlerFunc {
 
 		newPayday.UserID = userProfile.Id
 
-		createdPayday, err := paydayService.CreatePayday(newPayday)
+		_, err = paydayService.CreatePayday(newPayday)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payday"})
 			return
 		}
 
-		templ.Handler(views.PaydayCard(createdPayday)).ServeHTTP(ctx.Writer, ctx.Request)
+		paydays := paydayService.GetPaydays(userProfile.Id)
+
+		templ.Handler(views.PayDays(paydays)).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
+func Delete(paydayService services.Paydays) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		paydayID, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payday ID"})
+			return
+		}
+
+		err = paydayService.DeletePayday(paydayID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete payday"})
+			return
+		}
+
+		templ.Handler(views.Empty()).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
+func Update(paydayService services.Paydays) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		paydayID, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payday ID"})
+			return
+		}
+
+		updatedPayday := &models.Payday{
+			ID: paydayID,
+		}
+
+		err = ctx.ShouldBindJSON(updatedPayday)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		err = paydayService.UpdatePayday(updatedPayday)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update payday"})
+			return
+		}
+
+		payday, err := paydayService.GetPayday(paydayID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payday"})
+			return
+		}
+
+		templ.Handler(views.PaydayCard(payday)).ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }

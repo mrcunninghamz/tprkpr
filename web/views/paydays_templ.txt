@@ -1,0 +1,26 @@
+<sl-button variant=\"primary\" hx-get=\"/api/payday/new\" hx-target=\"next div\" hx-swap=\"afterbegin\" hx-trigger=\"click\">New Payday</sl-button> <sl-divider id=\"divider\"></sl-divider><div>
+</div>
+<sl-card class=\"card-overview\" id=\"
+\"><div slot=\"header\">Payday on day 
+ of the month. <sl-tooltip content=\"Add a bill\"><sl-icon-button name=\"plus-circle\" label=\"Add a bill\" hx-get=\"
+\" hx-target=\"
+\" hx-swap=\"beforeend\" hx-trigger=\"click\"></sl-icon-button></sl-tooltip></div>
+<div slot=\"footer\"><sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" hx-target=\"
+\" hx-trigger=\"click\">Edit</sl-button> 
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"/api/empty\" hx-target=\"
+\" hx-trigger=\"click\">Cancel</sl-button>
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Delete</sl-button>
+</div></sl-card>
+<sl-card class=\"card-overview\" id=\"
+\"><form hx-post=\"
+\" hx-ext=\"json-enc\" hx-target=\"#paydays\" hx-swap=\"innerHTML\" hx-trigger=\"submit\"><sl-input id=\"pay_date_of_month\" name=\"pay_date_of_month\" label=\"Pay Date of Month\" value=\"
+\" type=\"number\" pill></sl-input> <sl-button type=\"submit\" pill>Submit</sl-button> 
+<sl-button variant=\"text\" size=\"small\" hx-delete=\"/api/empty\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Cancel</sl-button>
+<sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" hx-target=\"
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Cancel</sl-button>
+</form></sl-card>
