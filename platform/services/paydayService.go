@@ -18,7 +18,7 @@ type PaydayService struct {
 	*gorm.DB
 }
 
-func NewPayDayService(db *gorm.DB) *PaydayService {
+func NewPaydayService(db *gorm.DB) *PaydayService {
 	return &PaydayService{
 		db,
 	}
@@ -42,8 +42,6 @@ func (service *PaydayService) GetPayday(paydayId uuid.UUID) (models.Payday, erro
 }
 
 func (service *PaydayService) CreatePayday(payday *models.Payday) (models.Payday, error) {
-	payday.ID, _ = uuid.NewV4()
-
 	result := service.DB.Create(payday)
 	if result.Error != nil {
 		return *payday, result.Error

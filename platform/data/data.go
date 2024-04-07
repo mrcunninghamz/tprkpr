@@ -21,11 +21,13 @@ func Connect() (*DataContext, error) {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&models.User{}, &models.Payday{}, &models.Bill{})
+	err = db.AutoMigrate(&models.User{}, &models.Payday{}, &models.Bill{}, &models.Worksheet{}, &models.WorksheetItem{})
 	if err != nil {
 
 		return nil, err
 	}
+
+	RunCustomSql(db)
 
 	for _, seed := range seeds.All() {
 		if err := seed.Run(db); err != nil {
@@ -38,34 +40,29 @@ func Connect() (*DataContext, error) {
 	}, nil
 }
 
-//func init() {
-//	payday1 := uuid.Must(uuid.NewV4())
-//	payday15 := uuid.Must(uuid.NewV4())
-//
-//	TprKprContext.Paydays = []Payday{
-//		{
-//			ID:             payday1,
-//			PayDateOfMonth: 1,
-//		},
-//		{
-//			ID:             payday15,
-//			PayDateOfMonth: 15,
-//		},
-//	}
-//	TprKprContext.Bills = []Bill{
-//		{
-//			ID:             uuid.Must(uuid.NewV4()),
-//			Name:           "Car",
-//			DueDateOfMonth: 8,
-//			Amount:         decimal.NewFromFloat(500.70),
-//			PaydayId:       payday1,
-//		},
-//		{
-//			ID:             uuid.Must(uuid.NewV4()),
-//			Name:           "Electricity",
-//			DueDateOfMonth: 17,
-//			Amount:         decimal.NewFromFloat(100.75),
-//			PaydayId:       payday15,
-//		},
-//	}
-//}
+func RunCustomSql(db *gorm.DB) {
+	db.Exec(`
+		CREATE OR REPLACE FUNCTION update_worksheet() RETURNS TRIGGER AS $update_worksheet$
+			BEGIN
+				IF (TG_OP = 'DELETE') THEN
+					UPDATE public.worksheets
+					SET total = COALESCE((select sum(amount) from public.worksheet_items where worksheet_id = OLD.worksheet_id), 0),
+					total_paid = COALESCE((select sum(amount) from public.worksheet_items where worksheet_id = OLD.worksheet_id and is_paid = true),0)
+					WHERE id = OLD.worksheet_id;
+					RETURN NULL;
+				END IF;
+		
+				UPDATE public.worksheets
+				SET total = COALESCE((select sum(amount) from public.worksheet_items where worksheet_id = NEW.worksheet_id),0),
+				total_paid = COALESCE((select sum(amount) from public.worksheet_items where worksheet_id = NEW.worksheet_id and is_paid = true),0)
+				WHERE id = NEW.worksheet_id;
+		
+				RETURN NULL;
+			END;
+		$update_worksheet$ LANGUAGE plpgsql;
+		
+		CREATE OR REPLACE TRIGGER update_worksheet
+		AFTER INSERT OR UPDATE OR DELETE ON public.worksheet_items
+    	FOR EACH ROW EXECUTE FUNCTION update_worksheet();
+	`)
+}

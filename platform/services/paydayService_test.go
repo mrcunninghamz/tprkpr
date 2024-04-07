@@ -24,7 +24,7 @@ func TestPaydayService_Get(t *testing.T) {
 		}
 		mock.ExpectQuery(`WHERE "paydays"."user_id" = ?`).WithArgs(userId).WillReturnRows(rows)
 
-		payDayService := NewPayDayService(db)
+		payDayService := NewPaydayService(db)
 		payDayService.GetPaydays(userId)
 	})
 }

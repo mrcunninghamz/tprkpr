@@ -18,7 +18,7 @@ templ PayDays(data []models.Payday){
 }
 
 templ PaydayCard(item models.Payday){
-    <sl-card class="card-overview" id={fmt.Sprintf("%s%s", "payday-", item.ID)}>
+    <sl-card class="card-overview" id={fmt.Sprintf("%s%s","payday-", item.ID)}>
             <div slot="header">
                 Payday on day { strconv.Itoa(item.PayDateOfMonth) } of the month.
                 <sl-tooltip content="Add a bill">

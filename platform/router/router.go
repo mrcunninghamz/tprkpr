@@ -11,6 +11,7 @@ import (
 	"github.com/mrcunninghamz/tprkpr/web/api/bills" // assuming this is the package name
 	"github.com/mrcunninghamz/tprkpr/web/api/empty"
 	"github.com/mrcunninghamz/tprkpr/web/api/paydays"
+	"github.com/mrcunninghamz/tprkpr/web/api/worksheets"
 	"github.com/mrcunninghamz/tprkpr/web/app/callback"
 	"github.com/mrcunninghamz/tprkpr/web/app/index"
 	"github.com/mrcunninghamz/tprkpr/web/app/login"
@@ -25,8 +26,9 @@ func New(auth *authenticator.Authenticator, dataContext *data.DataContext) *gin.
 	gob.Register(map[string]interface{}{})
 
 	store := cookie.NewStore([]byte("secret"))
-	paydayService := services.NewPayDayService(dataContext.DB)
+	paydayService := services.NewPaydayService(dataContext.DB)
 	billService := services.NewBillService(dataContext.DB)
+	worksheetService := services.NewWorksheetService(dataContext.DB)
 
 	router.Use(sessions.Sessions("auth-session", store))
 
@@ -49,6 +51,9 @@ func New(auth *authenticator.Authenticator, dataContext *data.DataContext) *gin.
 	router.POST("/api/bill/:id", bills.Update(billService))
 	router.POST("/api/bill/payday/:paydayId", bills.Create(billService))
 	router.DELETE("/api/bill/:id", bills.Delete(billService))
+
+	router.GET("/api/worksheets", worksheets.Get(worksheetService))
+	router.DELETE("/api/worksheet/:id", worksheets.Delete(worksheetService))
 
 	router.DELETE("/api/empty", empty.New)
 

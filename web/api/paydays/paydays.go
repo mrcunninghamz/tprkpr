@@ -1,14 +1,12 @@
 package paydays
 
 import (
-	"encoding/json"
 	"github.com/a-h/templ"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
-	"github.com/mrcunninghamz/tprkpr/platform/authenticator"
 	"github.com/mrcunninghamz/tprkpr/platform/data/models"
 	"github.com/mrcunninghamz/tprkpr/platform/services"
+	"github.com/mrcunninghamz/tprkpr/web/api/utilities"
 	"github.com/mrcunninghamz/tprkpr/web/views"
 	"net/http"
 )
@@ -33,11 +31,12 @@ func EditForm(paydayService services.Paydays) gin.HandlerFunc {
 
 func Get(paydayService services.Paydays) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		session := sessions.Default(ctx)
-		profile, _ := json.Marshal(session.Get("profile").(map[string]interface{}))
+		userProfile, err := utilities.GetUser(ctx)
 
-		userProfile := authenticator.UserProfile{}
-		json.Unmarshal(profile, &userProfile)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to user profile"})
+			return
+		}
 
 		paydays := paydayService.GetPaydays(userProfile.Id)
 
@@ -70,15 +69,16 @@ func NewForm(ctx *gin.Context) {
 
 func Create(paydayService services.Paydays) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		session := sessions.Default(ctx)
-		profile, _ := json.Marshal(session.Get("profile").(map[string]interface{}))
+		userProfile, err := utilities.GetUser(ctx)
 
-		userProfile := authenticator.UserProfile{}
-		json.Unmarshal(profile, &userProfile)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to user profile"})
+			return
+		}
 
 		newPayday := &models.Payday{}
 
-		err := ctx.ShouldBindJSON(newPayday)
+		err = ctx.ShouldBindJSON(newPayday)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

@@ -1,0 +1,34 @@
+package views
+
+import (
+    "fmt"
+    "github.com/mrcunninghamz/tprkpr/platform/data/models"
+)
+
+templ Worksheets(data map[string][]models.Worksheet){
+    <sl-button variant="primary" >New Worksheet</sl-button>
+    <sl-divider id="divider"></sl-divider>
+    <div id="worksheet-details">
+	for key, worksheets := range data {
+        <!-- Month -->
+        <sl-format-date month="long" year="numeric" date={key}></sl-format-date>
+        <sl-divider id="divider"></sl-divider>
+        for _, worksheet := range worksheets {
+            <sl-details summary={fmt.Sprintf("Payday %d of Month.", worksheet.Day) } id={fmt.Sprintf("%s%s", "worksheet-details-", worksheet.ID)}>
+                Available Funds on payday: <sl-format-number type="currency" currency="USD" value={worksheet.InBank.String()} lang="en-US"></sl-format-number>
+                <sl-divider vertical></sl-divider>
+                Total bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.String()} lang="en-US"></sl-format-number>
+                <sl-divider vertical></sl-divider>
+                Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.TotalPaid.String()} lang="en-US"></sl-format-number>
+                <sl-divider vertical></sl-divider>
+                Pending Bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.Sub(worksheet.TotalPaid).String()} lang="en-US"></sl-format-number>
+                <sl-divider vertical></sl-divider>
+                Balance after Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.NetAfterPaid.String()} lang="en-US"></sl-format-number>
+                <sl-divider></sl-divider>
+                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/worksheet/edit/", worksheet.ID)} hx-target="worksheet-details" hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
+                        <sl-button variant="text" size="small" hx-delete={fmt.Sprintf("%s%s", "/api/worksheet/", worksheet.ID)} hx-target={fmt.Sprintf("#%s%s", "worksheet-details-", worksheet.ID)} hx-swap="outerHTML" hx-trigger="click">Delete</sl-button>
+            </sl-details>
+        }
+	}
+    </div>
+}
