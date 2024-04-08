@@ -14,7 +14,7 @@ function shouldInclude(elt) {
 	}
 
 	if (elt.tagName === 'SL-CHECKBOX' || elt.tagName === 'SL-SWITCH') {
-		return elt.checked
+		return true
 	}
 
 	if (elt.tagName === "SL-RADIO-GROUP") {
@@ -31,7 +31,7 @@ htmx.defineExtension('shoelace', {
 				if (shouldInclude(elt)) {
 					if (elt.tagName === 'SL-CHECKBOX' || elt.tagName === 'SL-SWITCH') {
 						// Shoelace normally does this bit internally when the formdata event fires, but htmx doesn't fire the formdata event, so we do it here instead. See https://github.com/shoelace-style/shoelace/issues/1891
-						evt.detail.parameters[elt.name] = elt.value || 'on'
+						evt.detail.parameters[elt.name] = !elt.checked
 
 					} else if (elt.tagName == 'SL-RATING') {
 						evt.detail.parameters[elt.getAttribute('name')] = elt.value

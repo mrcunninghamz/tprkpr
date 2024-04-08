@@ -26,7 +26,7 @@ templ BillForm(data *models.Bill) {
             hx-target={fmt.Sprintf("#%s%s", "bill-detail-", data.ID)}
             hx-swap="outerHTML"
             hx-trigger="submit">
-    		<sl-input id="name" name="name" label="Name" value={data.Name} pill></sl-input>
+    		<sl-input id="name" name="name" label="Name" value={data.Name}></sl-input>
     		<sl-input id="amount" name="amount" label="Amount" value={data.Amount.String()}></sl-input>
     		<sl-input id="due_date_of_month" name="due_date_of_month" label="Due Date" value={strconv.Itoa(data.DueDateOfMonth)} type="number"></sl-input>
             <sl-visually-hidden>

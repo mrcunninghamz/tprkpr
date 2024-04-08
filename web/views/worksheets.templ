@@ -2,6 +2,7 @@ package views
 
 import (
     "fmt"
+    "strconv"
     "github.com/mrcunninghamz/tprkpr/platform/data/models"
 )
 
@@ -10,25 +11,54 @@ templ Worksheets(data map[string][]models.Worksheet){
     <sl-divider id="divider"></sl-divider>
     <div id="worksheet-details">
 	for key, worksheets := range data {
-        <!-- Month -->
         <sl-format-date month="long" year="numeric" date={key}></sl-format-date>
         <sl-divider id="divider"></sl-divider>
         for _, worksheet := range worksheets {
             <sl-details summary={fmt.Sprintf("Payday %d of Month.", worksheet.Day) } id={fmt.Sprintf("%s%s", "worksheet-details-", worksheet.ID)}>
-                Available Funds on payday: <sl-format-number type="currency" currency="USD" value={worksheet.InBank.String()} lang="en-US"></sl-format-number>
-                <sl-divider vertical></sl-divider>
-                Total bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.String()} lang="en-US"></sl-format-number>
-                <sl-divider vertical></sl-divider>
-                Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.TotalPaid.String()} lang="en-US"></sl-format-number>
-                <sl-divider vertical></sl-divider>
-                Pending Bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.Sub(worksheet.TotalPaid).String()} lang="en-US"></sl-format-number>
-                <sl-divider vertical></sl-divider>
-                Balance after Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.NetAfterPaid.String()} lang="en-US"></sl-format-number>
-                <sl-divider></sl-divider>
-                <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/worksheet/edit/", worksheet.ID)} hx-target="worksheet-details" hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
-                        <sl-button variant="text" size="small" hx-delete={fmt.Sprintf("%s%s", "/api/worksheet/", worksheet.ID)} hx-target={fmt.Sprintf("#%s%s", "worksheet-details-", worksheet.ID)} hx-swap="outerHTML" hx-trigger="click">Delete</sl-button>
+                @WorksheetDetail(worksheet)
             </sl-details>
         }
 	}
     </div>
+}
+
+templ WorksheetDetail(worksheet models.Worksheet){
+        Available Funds on payday: <sl-format-number type="currency" currency="USD" value={worksheet.InBank.String()} lang="en-US"></sl-format-number>
+        <sl-divider vertical></sl-divider>
+        Total bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.String()} lang="en-US"></sl-format-number>
+        <sl-divider vertical></sl-divider>
+        Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.TotalPaid.String()} lang="en-US"></sl-format-number>
+        <sl-divider vertical></sl-divider>
+        Pending Bills: <sl-format-number type="currency" currency="USD" value={worksheet.Total.Sub(worksheet.TotalPaid).String()} lang="en-US"></sl-format-number>
+        <sl-divider vertical></sl-divider>
+        Balance after Paid Bills: <sl-format-number type="currency" currency="USD" value={worksheet.NetAfterPaid.String()} lang="en-US"></sl-format-number>
+        <sl-divider></sl-divider>
+            for _, worksheetItem := range worksheet.Items {
+                @WorksheetItem(worksheetItem)
+            }
+        <sl-divider></sl-divider>
+        <sl-button variant="text" size="small" hx-get={fmt.Sprintf("%s%s", "/api/worksheet/edit/", worksheet.ID)} hx-target="worksheet-details" hx-swap="outerHTML" hx-trigger="click">Edit</sl-button>
+        <sl-button variant="text" size="small" hx-delete={fmt.Sprintf("%s%s", "/api/worksheet/", worksheet.ID)} hx-target={fmt.Sprintf("#%s%s", "worksheet-details-", worksheet.ID)} hx-swap="outerHTML" hx-trigger="click">Delete</sl-button>
+}
+
+templ WorksheetItem(item models.WorksheetItem){
+    <sl-card class="card-header" id={fmt.Sprintf("%s%s", "worksheet-item-details-", item.ID)}>
+      <div slot="header">
+        {item.Name} Due On {strconv.Itoa(item.DueDateOfMonth)}
+      </div>
+        <form
+            hx-post={fmt.Sprintf("%s%s", "/api/worksheet-item/", item.ID)}
+            hx-ext="json-enc"
+            hx-target={fmt.Sprintf("#%s%s", "worksheet-details-", item.WorksheetId)}
+            hx-trigger="keyup changed delay:500ms from:{find #name}, keyup changed delay:500ms from:{find #amount}, keyup changed delay:500ms from:{find #due_date_of_month}, click from:{find #is_paid}"
+            hx-swap="innerHTML">
+    		<sl-input id="name" name="name" label="Name" value={item.Name}></sl-input>
+    		<sl-input id="amount" name="amount" label="Amount" value={item.Amount.String()} ></sl-input>
+    		<sl-input id="due_date_of_month" name="due_date_of_month" label="Due Date" value={strconv.Itoa(item.DueDateOfMonth)} type="number"></sl-input>
+            <sl-switch id="is_paid" name="is_paid" checked?={item.IsPaid}>Paid</sl-switch>
+            <sl-visually-hidden>
+    		    <sl-input id="worksheet_id" name="worksheet_id" value={item.WorksheetId.String()}></sl-input>
+            </sl-visually-hidden>
+        </form>
+    </sl-card>
 }

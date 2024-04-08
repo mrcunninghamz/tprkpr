@@ -53,7 +53,10 @@ func New(auth *authenticator.Authenticator, dataContext *data.DataContext) *gin.
 	router.DELETE("/api/bill/:id", bills.Delete(billService))
 
 	router.GET("/api/worksheets", worksheets.Get(worksheetService))
+	router.GET("/api/worksheet/:id", worksheets.View(worksheetService))
 	router.DELETE("/api/worksheet/:id", worksheets.Delete(worksheetService))
+
+	router.POST("/api/worksheet-item/:id", worksheets.UpdateWorksheetItem(worksheetService))
 
 	router.DELETE("/api/empty", empty.New)
 

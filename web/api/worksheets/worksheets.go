@@ -31,6 +31,26 @@ func Get(worksheetService services.Worksheets) func(c *gin.Context) {
 	}
 }
 
+func View(worksheetService services.Worksheets) func(c *gin.Context) {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+
+		worksheetId, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid worksheet ID"})
+			return
+		}
+
+		worksheet, err := worksheetService.GetWorksheet(worksheetId)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		templ.Handler(views.WorksheetDetail(worksheet)).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
 func Delete(worksheetService services.Worksheets) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
@@ -47,6 +67,41 @@ func Delete(worksheetService services.Worksheets) gin.HandlerFunc {
 		}
 
 		templ.Handler(views.Empty()).ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
+func UpdateWorksheetItem(worksheetService services.Worksheets) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id := ctx.Param("id")
+		worksheetItem := &models.WorksheetItem{}
+
+		err := ctx.ShouldBindJSON(worksheetItem)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid worksheet item"})
+			return
+		}
+
+		worksheetItemId, err := uuid.FromString(id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid worksheet item ID"})
+			return
+		}
+
+		worksheetItem.ID = worksheetItemId
+
+		err = worksheetService.UpdateWorksheetItem(worksheetItem)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "issue updating worksheet item"})
+			return
+		}
+
+		worksheet, err := worksheetService.GetWorksheet(worksheetItem.WorksheetId)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		templ.Handler(views.WorksheetDetail(worksheet)).ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
 

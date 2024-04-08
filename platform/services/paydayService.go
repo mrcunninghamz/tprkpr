@@ -50,7 +50,7 @@ func (service *PaydayService) CreatePayday(payday *models.Payday) (models.Payday
 }
 
 func (service *PaydayService) UpdatePayday(payday *models.Payday) error { // New function implementation
-	result := service.DB.Model(payday).Updates(*payday)
+	result := service.DB.Save(*payday)
 	return result.Error
 }
 

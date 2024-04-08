@@ -1,15 +1,30 @@
 <sl-button variant=\"primary\">New Worksheet</sl-button> <sl-divider id=\"divider\"></sl-divider><div id=\"worksheet-details\">
-<!-- Month --> <sl-format-date month=\"long\" year=\"numeric\" date=\"
+<sl-format-date month=\"long\" year=\"numeric\" date=\"
 \"></sl-format-date> <sl-divider id=\"divider\"></sl-divider> 
 <sl-details summary=\"
 \" id=\"
-\">Available Funds on payday: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
+\">
+</sl-details>
+</div>
+Available Funds on payday: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
 \" lang=\"en-US\"></sl-format-number> <sl-divider vertical></sl-divider> Total bills: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
 \" lang=\"en-US\"></sl-format-number> <sl-divider vertical></sl-divider> Paid Bills: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
 \" lang=\"en-US\"></sl-format-number> <sl-divider vertical></sl-divider> Pending Bills: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
 \" lang=\"en-US\"></sl-format-number> <sl-divider vertical></sl-divider> Balance after Paid Bills: <sl-format-number type=\"currency\" currency=\"USD\" value=\"
-\" lang=\"en-US\"></sl-format-number> <sl-divider></sl-divider> <sl-button variant=\"text\" size=\"small\" hx-get=\"
+\" lang=\"en-US\"></sl-format-number> <sl-divider></sl-divider> 
+<sl-divider></sl-divider> <sl-button variant=\"text\" size=\"small\" hx-get=\"
 \" hx-target=\"worksheet-details\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Edit</sl-button> <sl-button variant=\"text\" size=\"small\" hx-delete=\"
 \" hx-target=\"
-\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Delete</sl-button></sl-details>
-</div>
+\" hx-swap=\"outerHTML\" hx-trigger=\"click\">Delete</sl-button>
+<sl-card class=\"card-header\" id=\"
+\"><div slot=\"header\">
+ Due On 
+</div><form hx-post=\"
+\" hx-ext=\"json-enc\" hx-target=\"
+\" hx-trigger=\"keyup changed delay:500ms from:{find #name}, keyup changed delay:500ms from:{find #amount}, keyup changed delay:500ms from:{find #due_date_of_month}, click from:{find #is_paid}\" hx-swap=\"innerHTML\"><sl-input id=\"name\" name=\"name\" label=\"Name\" value=\"
+\"></sl-input> <sl-input id=\"amount\" name=\"amount\" label=\"Amount\" value=\"
+\"></sl-input> <sl-input id=\"due_date_of_month\" name=\"due_date_of_month\" label=\"Due Date\" value=\"
+\" type=\"number\"></sl-input> <sl-switch id=\"is_paid\" name=\"is_paid\"
+ checked
+>Paid</sl-switch> <sl-visually-hidden><sl-input id=\"worksheet_id\" name=\"worksheet_id\" value=\"
+\"></sl-input></sl-visually-hidden></form></sl-card>
